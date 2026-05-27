@@ -1,24 +1,31 @@
 package com.sky.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.PasswordConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.context.BaseContext;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
+import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
 import com.sky.exception.AccountNotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
+import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.DigestUtils;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 @Slf4j
 @Service
@@ -67,7 +74,7 @@ public class EmployeeServiceImpl implements EmployeeService {
      * 保存员工
      * @param employeeDTO
      */
-    public void save(EmployeeDTO employeeDTO) {
+    public void save(@RequestBody EmployeeDTO employeeDTO) {
         //1.将DTO转为实体类
         Employee employee =new Employee();
         BeanUtils.copyProperties(employeeDTO,employee);
@@ -84,6 +91,17 @@ public class EmployeeServiceImpl implements EmployeeService {
         log.info("service登录者工id：{}",BaseContext.getCurrentId());
         //6.插入数据
         employeeMapper.insert(employee);
+    }
+
+    /**
+     *员工的分页查询
+     */
+    @Override
+    public PageResult page(EmployeePageQueryDTO empDTO) {
+        PageHelper.startPage(empDTO.getPage(),empDTO.getPageSize());
+        List<Employee> employeeList= employeeMapper.selectByPage(empDTO);
+        Page<Employee> pages =(Page<Employee>) employeeList;
+        return new PageResult(pages.getTotal(),pages.getResult());
     }
 
 }
