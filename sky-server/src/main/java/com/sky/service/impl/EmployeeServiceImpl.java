@@ -104,4 +104,43 @@ public class EmployeeServiceImpl implements EmployeeService {
         return new PageResult(pages.getTotal(),pages.getResult());
     }
 
+    /**
+     * 账号启/禁用
+     */
+    @Override
+    public void startOrStop(Integer status, Long id) {
+//        employeeMapper.startOrStop(status,id);
+        Employee employee =  Employee.builder()
+                .id(id)
+                .status(status)
+                .build();
+
+        employeeMapper.update(employee);
+
+    }
+
+    /**
+     * 查询
+     */
+    @Override
+    public Employee findById(Integer id) {
+        Employee employee = employeeMapper.selectById(id);
+        //出于安全性，不要直接把密码直接传给前端
+        employee.setPassword("****");
+        return employee;
+
+    }
+
+    /**
+     * 修改员工信息
+     */
+    @Override
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO,employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
+    }
+
 }

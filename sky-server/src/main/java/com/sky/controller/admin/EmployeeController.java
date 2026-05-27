@@ -88,11 +88,48 @@ public class EmployeeController {
         employeeService.save(employeeDTO);
         return Result.success();
     }
-@ApiOperation("分页查询")
+
+    /**
+     * 分页查询
+     */
+    @ApiOperation("分页查询")
 @GetMapping("/page")
     public Result<PageResult> page(EmployeePageQueryDTO empDTO){
         log.info("员工分页查询，参数{}",empDTO);
     PageResult pageResult =employeeService.page(empDTO);
         return Result.success(pageResult);
+    }
+    /**
+     * 账号启/禁用
+     */
+    @ApiOperation("账号启/禁用")
+    @PostMapping("/status/{status}")
+    public Result startOrStop(
+            @PathVariable Integer status,
+            @RequestParam Long id) {
+        log.info("设置员工状态{},{}",status,id);
+        employeeService.startOrStop(status, id);
+
+        return Result.success();
+    }
+    /**
+     * 根据id查询
+     */
+@ApiOperation("查询员工")
+@GetMapping("/{id}")
+    public Result<Employee> findById(@PathVariable Integer id){
+    log.info("查询id为：{}的员工",id);
+   Employee employee=  employeeService.findById(id);
+   return Result.success(employee);
+    }
+    /**
+     * 修改员工信息
+     */
+@ApiOperation("修改员工信息")
+@PutMapping
+    public Result update(@RequestBody EmployeeDTO employeeDTO){
+        log.info("修改员工信息:{}",employeeDTO);
+        employeeService.update(employeeDTO);
+        return Result.success();
     }
 }
