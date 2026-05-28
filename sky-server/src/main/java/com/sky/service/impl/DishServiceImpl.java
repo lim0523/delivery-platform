@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -83,5 +84,51 @@ public class DishServiceImpl implements DishService {
         dishMapper.deleteBatch(ids);
         dishFlavorMapper.deleteBatch(ids);
 
+    }
+
+    /**
+     *修改菜品信息时的查询回显
+     */
+    @Override
+    public DishVO find(Long id) {
+        return dishMapper.find(id);
+    }
+
+    /**
+     *修改菜品信息
+     * Controller 接收 DishDTO
+     *         ↓
+     * Service 开事务
+     *         ↓
+     * 更新 dish 表基本信息
+     *         ↓
+     * 删除原来的 dish_flavor
+     *         ↓
+     * 重新批量插入新的 flavors
+     */
+    @Transactional
+    @Override
+    public void update(DishDTO dishDTO) {
+        //1.更新dish基本信息
+        Dish dish = new Dish();
+        BeanUtils.copyProperties(dishDTO,dish);
+        dishMapper.update(dish);
+        //2.删除原来的dish_flavor
+        List<Long> list = new ArrayList<>();
+        list.add(dishDTO.getId());
+        dishFlavorMapper.deleteBatch(list);
+        //3.批量插入新的flavors
+        List<DishFlavor> flavors =dishDTO.getFlavors();
+        if (flavors!=null&&!flavors.isEmpty()) {
+            flavors.forEach(flavor->{
+                flavor.setDishId(dishDTO.getId());
+            });
+            dishFlavorMapper.insertBatch(flavors);
+        }
+    }
+
+    @Override
+    public void saleOrForbidden(Long id,Integer status) {
+        dishMapper.saleOrForbidden(id,status);
     }
 }

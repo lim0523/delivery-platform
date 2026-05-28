@@ -1,6 +1,20 @@
 <!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
 <mapper namespace="com.sky.mapper.DishMapper">
+    <update id="update">
+        update dish
+        <set>
+            <if test="name != null and name!=''">name = #{name},</if>
+            <if test="categoryId != null">category_id = #{categoryId},</if>
+            <if test="price != null">price = #{price},</if>
+            <if test="image != null">image = #{image},</if>
+            <if test="description != null">description = #{description},</if>
+            <if test="status != null">status = #{status},</if>
+            <if test="updateTime != null">update_time = #{updateTime},</if>
+            <if test="updateUser != null">update_user = #{updateUser},</if>
+        </set>
+        where id = #{id}
+    </update>
     <delete id="deleteBatch">
         delete from dish where id in
             <foreach collection="ids" item="id" separator="," open="(" close=")" >
@@ -25,5 +39,37 @@
             </if>
         </where>
         order by update_time desc
+    </select>
+
+
+    <resultMap id="resultMap" type="com.sky.vo.DishVO">
+       <id column="dish_id" property="id"/>
+        <result column="description" property="description"/>
+        <result column="category_id" property="categoryId"/>
+        <result column="image" property="image"/>
+        <result column="dish_name" property="name"/>
+        <result column="price" property="price"/>
+        <collection property="flavors" ofType="com.sky.entity.DishFlavor">
+            <id column="flavor_id" property="id"/>
+            <id column="dish_id" property="dishId"/>
+            <result column="flavor_name" property="name"/>
+            <result column="value" property="value"/>
+        </collection>
+    </resultMap>
+    <select id="find" resultMap="resultMap">
+        select
+            d.id              as dish_id,
+            d.name            as dish_name,
+            d.category_id,
+            d.price,
+            d.image,
+            d.description,
+            f.id              as flavor_id,
+            f.name            as flavor_name,
+            f.dish_id,
+            f.value
+        from dish d
+            left join dish_flavor f on d.id = f.dish_id
+        where d.id =#{id}
     </select>
 </mapper>
