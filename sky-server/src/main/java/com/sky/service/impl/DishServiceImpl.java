@@ -2,14 +2,18 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MessageConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.entity.DishFlavor;
+import com.sky.exception.DeletionNotAllowedException;
 import com.sky.mapper.DishFlavorMapper;
 import com.sky.mapper.DishMapper;
+import com.sky.mapper.SetMealDishMapper;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
+import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -23,6 +27,8 @@ public class DishServiceImpl implements DishService {
     DishMapper dishMapper;
     @Autowired
     DishFlavorMapper dishFlavorMapper;
+    @Autowired
+    SetMealDishMapper mealDishMapper;
 
     @Override
     @Transactional
@@ -49,11 +55,33 @@ public class DishServiceImpl implements DishService {
      */
     @Override
     public PageResult page(DishPageQueryDTO pageQueryDTO) {
-        Dish dish = new Dish();
-        BeanUtils.copyProperties(pageQueryDTO,dish);
         PageHelper.startPage(pageQueryDTO.getPage(),pageQueryDTO.getPageSize());
-        List<Dish> dishList =dishMapper.page(dish);
+        List<DishVO> dishList =dishMapper.page(pageQueryDTO);
         Page pages= (Page) dishList;
         return new PageResult(pages.getTotal(),pages.getResult());
+    }
+
+    /**
+     * 批量删除菜品，删除前两个判断+删除时事务管理
+     * @param ids
+     */
+    @Transactional
+    @Override
+    public void deleteBatch(List<Long> ids) {
+        //1.判断菜品状态
+        ids.forEach(id->{
+            if(dishMapper.onOrOff(id)==1){
+                throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
+            }
+        });
+        //2.判断是否存在套餐与当前菜品关联
+        List<Long> longs = mealDishMapper.selectByDishId(ids);
+        if(longs!=null&&!longs.isEmpty()){
+            throw new DeletionNotAllowedException(MessageConstant.DISH_BE_RELATED_BY_SETMEAL);
+        }
+        //菜品能删除的情况下，删除菜品及其对应的口味
+        dishMapper.deleteBatch(ids);
+        dishFlavorMapper.deleteBatch(ids);
+
     }
 }

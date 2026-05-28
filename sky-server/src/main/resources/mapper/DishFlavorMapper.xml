@@ -4,9 +4,14 @@
     <insert id="insertBatch">
         insert into dish_flavor (dish_id, name, value)
         values
-#             分隔符是因为有多组数据插入(),()
         <foreach collection="flavors" item="df" separator=",">
             (#{df.dishId}, #{df.name}, #{df.value})
         </foreach>
     </insert>
+    <delete id="deleteBatch">
+        delete from dish_flavor where dish_id in
+        <foreach collection="ids" item="id" separator="," open="(" close=")" >
+            #{id}
+        </foreach>
+    </delete>
 </mapper>

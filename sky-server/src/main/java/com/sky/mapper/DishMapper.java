@@ -1,8 +1,10 @@
 package com.sky.mapper;
 
 import com.sky.annotation.AutoFill;
+import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -32,5 +34,12 @@ public interface DishMapper {
     /**
      *多表+分页查询
      */
-    List<Dish> page(Dish dish);
+    List<DishVO> page(DishPageQueryDTO pageQueryDTO);
+    /**
+     * 查询菜品状态
+     */
+@Select("select status from dish where id =#{id} ")
+    Integer onOrOff(Long id);
+
+    void deleteBatch(List<Long> ids);
 }
