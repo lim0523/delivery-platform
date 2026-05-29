@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.SetMealMapper">
+    <update id="update">
+        update setmeal
+        set
+            category_id = #{categoryId},
+            name = #{name},
+            price = #{price},
+            image = #{image},
+            description = #{description},
+            status = #{status},
+            update_time = #{updateTime},
+            update_user = #{updateUser}
+        where id = #{id}
+    </update>
+
+
+    <update id="saleOrForbidden">
+        update setmeal set status =#{status},update_time=#{updateTime}
+                       where id =#{id}
+    </update>
+
+    <delete id="deleteBatch">
+        delete from setmeal where id in
+            <foreach collection="ids" item="id" open="(" close=")" separator=",">
+                #{id}
+            </foreach>
+    </delete>
+
+
+    <select id="page" resultType="com.sky.vo.SetmealVO">
+        select s.id, category_id, s.name, price, s.status, description, image, s.update_time,
+               c.name as categoryName
+        from setmeal s left join category c on category_id = c.id
+        <where>
+            <if test="categoryId!=null">
+                and category_id=#{categoryId}
+            </if>
+        <if test="name!=null and name!=''">
+            and s.name like concat('%',#{name},'%')
+        </if>
+        <if test="status!=null">
+            and s.status=#{status}
+        </if>
+        </where>
+    </select>
+    <select id="findById" resultType="com.sky.vo.SetmealVO">
+        select s.id, category_id , s.name, price, s.status, description, image,
+               s.update_time ,c.name categoryName
+        from setmeal s left join category c on s.category_id = c.id
+        where s.id=#{id}
+    </select>
+</mapper>

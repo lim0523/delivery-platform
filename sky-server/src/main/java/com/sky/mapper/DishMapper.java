@@ -38,12 +38,32 @@ public interface DishMapper {
 @Select("select status from dish where id =#{id} ")
     Integer onOrOff(Long id);
 
+    /**
+     * 批量删除
+     */
     void deleteBatch(List<Long> ids);
 
+    /**
+     *根据id查询
+     */
     DishVO find(Long id);
-@AutoFill(value = OperationType.UPDATE)
+
+    /**
+     *修改菜品基本信息
+     */
+    @AutoFill(value = OperationType.UPDATE)
     void update(Dish dish);
 
-@Update("update dish set status =#{status} where id=#{id} ")
+    /**
+     *根据id修改状态
+     */
+    @Update("update dish set status =#{status} where id=#{id} ")
     void saleOrForbidden(Long id,Integer status);
+
+    @Select("select id, name,  price, status " +
+            " from dish where category_id=#{categoryId}")
+    List<DishVO> selectBatch(Integer categoryId);
+    @Select("select a.* from dish a left join setmeal_dish b " +
+            "on a.id = b.dish_id where b.setmeal_id = #{id}")
+    List<Dish> selectBySMId(Long id);
 }

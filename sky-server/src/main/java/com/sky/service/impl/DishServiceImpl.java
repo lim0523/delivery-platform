@@ -131,4 +131,9 @@ public class DishServiceImpl implements DishService {
     public void saleOrForbidden(Long id,Integer status) {
         dishMapper.saleOrForbidden(id,status);
     }
+
+    @Override
+    public List<DishVO> findList(Integer categoryId) {
+        return dishMapper.selectBatch(categoryId);
+    }
 }
