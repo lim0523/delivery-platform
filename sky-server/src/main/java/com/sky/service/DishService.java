@@ -21,5 +21,11 @@ public interface DishService {
 
     void saleOrForbidden(Long id,Integer status);
 
-    List<DishVO> findList(Integer categoryId);
+    List<DishVO> findList(Long categoryId);
+    /**
+     * 条件查询菜品和口味
+     * @param dish
+     * @return
+     */
+    List<DishVO> listWithFlavor(Dish dish);
 }

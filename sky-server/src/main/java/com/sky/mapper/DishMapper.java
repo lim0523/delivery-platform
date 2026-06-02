@@ -62,8 +62,11 @@ public interface DishMapper {
 
     @Select("select id, name,  price, status " +
             " from dish where category_id=#{categoryId}")
-    List<DishVO> selectBatch(Integer categoryId);
+    List<DishVO> selectBatch(Long categoryId);
     @Select("select a.* from dish a left join setmeal_dish b " +
             "on a.id = b.dish_id where b.setmeal_id = #{id}")
     List<Dish> selectBySMId(Long id);
+
+    List<Dish> list(Dish dish);
+
 }

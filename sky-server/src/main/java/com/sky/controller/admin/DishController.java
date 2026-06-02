@@ -66,7 +66,7 @@ public Result update(@RequestBody DishDTO dishDTO){
 }
 @ApiOperation("查询种类下的所有菜品")
     @GetMapping("/list")
-    public Result<List<DishVO>> findList(@RequestParam Integer categoryId){
+    public Result<List<DishVO>> findList(@RequestParam Long categoryId){
           log.info("查询categoryId为:{}的菜品",categoryId);
            List<DishVO> dishList=dishService.findList(categoryId);
           return Result.success(dishList);
