@@ -69,4 +69,7 @@ public interface DishMapper {
 
     List<Dish> list(Dish dish);
 
+    @Select("select * from dish where id = #{id}")
+    Dish getById(Long id);
+
 }

@@ -40,5 +40,10 @@ public class GlobalExceptionHandler {
             return Result.error(MessageConstant.UNKNOWN_ERROR);
         }
     }
+    @ExceptionHandler(Exception.class)
+    public Result exceptionHandler(Exception ex) {
+        log.error("未知异常：", ex);
+        return Result.error("未知错误");
+    }
 
 }
