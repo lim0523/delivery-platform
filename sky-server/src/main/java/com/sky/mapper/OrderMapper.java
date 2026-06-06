@@ -1,10 +1,11 @@
 package com.sky.mapper;
 
 import com.sky.entity.Orders;
-import org.apache.ibatis.annotations.Insert;
+import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
+
+import java.util.List;
 
 @Mapper
 public interface OrderMapper {
@@ -21,4 +22,10 @@ public interface OrderMapper {
      * @param orders
      */
     void update(Orders orders);
+@Select("select * from orders where user_id=#{userId} order by order_time desc")
+    List<Orders> getOrdersByUid(Long userId);
+@Select("select * from orders where id=#{id}")
+    Orders selectById(Long id);
+@Delete("delete from orders where id=#{id}")
+    void deleteById(Long id);
 }

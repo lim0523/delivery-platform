@@ -50,6 +50,7 @@ public class UserServiceImpl implements UserService {
         log.error("微信登录失败，返回结果：{}", json);
         throw new LoginFailedException(MessageConstant.LOGIN_FAILED);
     }
+//        String openid = "test_openid";
         //判断当前用户是否为新用户
         User user = userMapper.getByOpenid(openid);
         //如果新用户，自动完成注册

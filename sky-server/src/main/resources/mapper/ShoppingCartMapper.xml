@@ -29,6 +29,33 @@
                 #{createTime}
             )
     </insert>
+    <insert id="insertBatch">
+        insert into shopping_cart
+        (
+            name,
+            image,
+            user_id,
+            dish_id,
+            setmeal_id,
+            dish_flavor,
+            number,
+            amount,
+            create_time
+        ) values
+        <foreach collection="shoppingCartList" item="c" separator=",">
+            (
+            #{c.name},
+            #{c.image},
+            #{c.userId},
+            #{c.dishId},
+            #{c.setmealId},
+            #{c.dishFlavor},
+            #{c.number},
+            #{c.amount},
+            #{c.createTime}
+            )
+        </foreach>
+    </insert>
     <select id="list" resultType="com.sky.entity.ShoppingCart">
         select *
         from shopping_cart
