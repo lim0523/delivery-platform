@@ -1,8 +1,14 @@
 package com.sky.vo;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
-import java.io.Serializable;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 @Data
 public class OrderStatisticsVO implements Serializable {
     //待接单数量
