@@ -11,8 +11,10 @@ import com.sky.exception.AddressBookBusinessException;
 import com.sky.exception.OrderBusinessException;
 import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
+import com.sky.properties.ShopProperties;
 import com.sky.result.PageResult;
 import com.sky.service.OrderService;
+import com.sky.utils.BaiduMapUtil;
 import com.sky.vo.OrderPaymentVO;
 import com.sky.vo.OrderStatisticsVO;
 import com.sky.vo.OrderSubmitVO;
@@ -44,6 +46,10 @@ public class OrderServiceImpl implements OrderService {
     AddressBookMapper addressBookMapper;
     @Autowired
     UserMapper userMapper;
+    @Autowired
+    BaiduMapUtil baiduMapUtil;
+    @Autowired
+    ShopProperties shopProperties;
     private void cancelOrderCommon(Long id, String cancelReason, List<Integer> allowedStatusList) {
         Orders orders = orderMapper.selectById(id);
         if (orders == null) {
@@ -97,7 +103,28 @@ public class OrderServiceImpl implements OrderService {
                 + addressBook.getDistrictName()
                 + addressBook.getDetail();
         orders.setAddress(address);
-        orderMapper.insert(orders);//要设置主键回显，用于明细表的数据
+        //1.获取门店坐标
+        String shopLocation =
+                baiduMapUtil.getLocation(
+                        shopProperties.getAddress());
+
+        //2.获取用户坐标
+        String userLocation =
+                baiduMapUtil.getLocation(
+                        addressBook.getDetail());
+
+    //3.计算距离
+        Integer distance =
+                baiduMapUtil.getDistance(
+                        shopLocation,
+                        userLocation);
+
+    //4.校验
+        if(distance > 5000){
+            throw new OrderBusinessException("超出配送范围");
+        }
+            //要设置主键回显，用于明细表的数据
+        orderMapper.insert(orders);
         //2.向order_details表插入n条数据
         List<OrderDetail> orderDetailList=new ArrayList<>();
         for (ShoppingCart cart : shoppingCartList) {
