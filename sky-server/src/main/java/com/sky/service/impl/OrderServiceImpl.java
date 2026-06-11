@@ -1,5 +1,6 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
@@ -13,6 +14,7 @@ import com.sky.exception.ShoppingCartBusinessException;
 import com.sky.mapper.*;
 import com.sky.properties.ShopProperties;
 import com.sky.result.PageResult;
+import com.sky.server.WebSocketServer;
 import com.sky.service.OrderService;
 import com.sky.utils.BaiduMapUtil;
 import com.sky.vo.OrderPaymentVO;
@@ -28,10 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 @Slf4j
 @Service
@@ -50,6 +49,8 @@ public class OrderServiceImpl implements OrderService {
     BaiduMapUtil baiduMapUtil;
     @Autowired
     ShopProperties shopProperties;
+    @Autowired
+    WebSocketServer webSocketServer;
     private void cancelOrderCommon(Long id, String cancelReason, List<Integer> allowedStatusList) {
         Orders orders = orderMapper.selectById(id);
         if (orders == null) {
@@ -207,6 +208,14 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(orders);
+        //通过websocket向客户端推送数据：type orderId content
+        Map map=new HashMap<>();
+        map.put("type",1);//1 来单提醒 2 用户催单
+        map.put("orderId",ordersDB.getId());
+        map.put("content","订单号："+outTradeNo);
+
+        String jsonString = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(jsonString);
     }
 
     @Override
@@ -337,6 +346,14 @@ public class OrderServiceImpl implements OrderService {
                 || status.equals(Orders.CANCELLED)) {
             throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
         }
+        Map map=new HashMap<>();
+        map.put("type",2);//1 来单提醒 2 用户催单
+        map.put("orderId",id);
+        map.put("content","订单号："+id);
+
+        String jsonString = JSON.toJSONString(map);
+        webSocketServer.sendToAllClient(jsonString);
+
     }
     /**
      * 商家取消订单，两种状态下被允许
