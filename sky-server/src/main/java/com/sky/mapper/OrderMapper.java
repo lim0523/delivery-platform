@@ -1,11 +1,14 @@
 package com.sky.mapper;
 
+import com.sky.dto.OrderReportDTO;
 import com.sky.dto.OrdersPageQueryDTO;
+import com.sky.dto.OrdersStatisticsDTO;
 import com.sky.entity.Orders;
 import org.apache.ibatis.annotations.Delete;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -44,5 +47,19 @@ public interface OrderMapper {
      */
     @Select("select * from orders where status=#{status} and order_time<=#{orderTime} ")
     List<Orders> selectByStatusAndOrderTime(Integer status, LocalDateTime orderTime);
+/**
+ * 查询指定日期内的订单金额总和，在sql就进行null处理ifnull(sum(amount),0)表示为空时传0
+ */
+//@Select("select ifnull(sum(amount),0) from orders where order_time between #{begin} and " +
+//        "#{end} and status=5")
+//BigDecimal selectTurnoverByDate(LocalDateTime begin,LocalDateTime end);
 
+    BigDecimal selectByCondition(OrdersStatisticsDTO dto);
+
+    /**
+     * 根据时间和状态查询订单数
+     * @param sumDTO
+     * @return
+     */
+    Integer selectCountByStatusAndOrderTime(OrderReportDTO sumDTO);
 }

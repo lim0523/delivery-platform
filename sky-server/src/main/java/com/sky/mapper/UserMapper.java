@@ -6,6 +6,9 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
 @Mapper
 public interface UserMapper {
     @Select("select * from user where id=#{userId}")
@@ -21,5 +24,5 @@ public interface UserMapper {
     void insert(User user);
 
 
-
+    Integer getByCreateTime(LocalDateTime beginDate, LocalDateTime endDate);
 }

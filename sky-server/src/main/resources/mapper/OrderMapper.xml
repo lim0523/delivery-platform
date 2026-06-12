@@ -107,4 +107,36 @@
 
         order by order_time desc
     </select>
+    <select id="selectByCondition" resultType="java.math.BigDecimal">
+        select ifnull(sum(amount),0)
+        from orders
+        <where>
+            <if test="beginDate != null">
+                and order_time &gt;= #{beginDate}
+            </if>
+            <if test="endDate != null">
+                and order_time &lt;= #{endDate}
+            </if>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+    <select id="selectCountByStatusAndOrderTime" resultType="java.lang.Integer">
+        select count(*) from orders
+        <where>
+            <if test="beginDate != null">
+                and order_time &gt;= #{beginDate}
+            </if>
+
+            <if test="endDate != null">
+                and order_time &lt; #{endDate}
+            </if>
+
+            <if test="status != null">
+                and status = #{status}
+            </if>
+        </where>
+    </select>
+
 </mapper>

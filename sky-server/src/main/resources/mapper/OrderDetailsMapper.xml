@@ -38,4 +38,19 @@
             #{orderId}
         </foreach>
     </select>
+    <select id="selectTopByDate" resultType="com.sky.dto.GoodsSalesDTO">
+        select
+        d.name,
+        sum(d.number) number
+        from order_detail d
+        join orders o
+        on d.order_id = o.id
+        where o.order_time &gt;= #{beginDate}
+        and o.order_time &lt; #{endDate}
+        and o.status = #{status}
+        group by d.name
+        order by number desc
+        limit 10
+    </select>
+
 </mapper>

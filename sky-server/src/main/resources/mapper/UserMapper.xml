@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.sky.mapper.UserMapper">
+
+
+    <select id="getByCreateTime" resultType="java.lang.Integer">
+        select ifnull(count(*),0) from user
+        <where>
+            <if test="beginDate!=null">
+                create_time &gt;= #{beginDate}
+            </if>
+            <if test="endDate!=null">
+                 and create_time &lt; #{endDate}
+            </if>
+
+        </where>
+    </select>
+</mapper>
